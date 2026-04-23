@@ -1,0 +1,28 @@
+# --- Unreal Engine 관련 ---
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vscode/
+.vs/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# --- 빌드 결과물 및 로그 ---
+obj/
+*.log
+*.tmp
+*.pdb
+
+# --- 플러그인 빌드 결과물 ---
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# --- 기타 OS 관련 ---
+.DS_Store
+Thumbs.db
