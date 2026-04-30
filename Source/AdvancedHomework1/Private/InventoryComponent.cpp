@@ -136,7 +136,7 @@ void UInventoryComponent::AddTitle(const FString& Title)
 
 FItemData UInventoryComponent::GetItemInfo(int32 ItemID)
 {
-    // TMap의 Contains를 사용해 Key가 존재하는지 먼저 확인 (O(1) 속도)
+    // TMap의 Contains를 사용해 Key가 존재하는지 먼저 확인
     if (ItemMap.Contains(ItemID))
     {
         UE_LOG(LogTemp, Warning, TEXT("아이템 검색 성공: %s"), *ItemMap[ItemID].Name);
