@@ -103,7 +103,7 @@ bool UInventoryComponent::UseItem(int32 ItemID)
     {
         Item.Count--;
 
-        // TArray(Inventory) 동기화 및 필요 시 삭제 (루프 한 번에 처리)
+        // TArray(Inventory) 동기화 및 필요 시 삭제
         for (int32 i = 0; i < Inventory.Num(); i++)
         {
             if (Inventory[i].ItemID == ItemID)

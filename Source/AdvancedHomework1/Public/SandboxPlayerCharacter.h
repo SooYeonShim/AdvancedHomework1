@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"         
 #include "GameFramework/SpringArmComponent.h" 
 #include "GameFramework/Character.h"
+#include "HealthComponent.h"
+#include "QuestComponent.h"
 #include "SandboxPlayerCharacter.generated.h"
 
 UCLASS()
@@ -18,7 +20,7 @@ public:
 	// Sets default values for this character's properties
 	ASandboxPlayerCharacter();
 
-	// ¹«±â ¹ß»ç ÇÔ¼ö
+	// ë°œì‚¬ í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable)
 	void StartFire();
 
@@ -28,20 +30,31 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnStopAiming();
 
-protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest")
+	UQuestComponent* QuestComponent;
+
+	UFUNCTION()
+	void HandleDeath();
+
+
+	protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// ¿¡µğÅÍ¿¡¼­ ¹«±â Å¬·¡½º¸¦ ¼±ÅÃÇÏ±â À§ÇÑ º¯¼ö
+	// ì—ë””í„°ì—ì„œ ì„¤ì • ê°€ëŠ¥í•œ ë¬´ê¸° í´ë˜ìŠ¤
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<ASandboxWeaponBase> WeaponClass;
 
 	UPROPERTY()
 	ASandboxWeaponBase* CurrentWeapon;
 
-	// C++¿¡¼­ Ä«¸Ş¶ó¿Í ½ºÇÁ¸µ¾ÏÀ» Á¦¾îÇÒ ¼ö ÀÖµµ·Ï ¼±¾ğ
+	// C++ì—ì„œ ì¹´ë©”ë¼ì™€ ìŠ¤í”„ë§ì•”ì„ ì œì–´í•  ìˆ˜ ìˆë„ë¡ ì„ ì–¸
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* FollowCamera;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	USpringArmComponent* SpringArm;

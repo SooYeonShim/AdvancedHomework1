@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h" 
+#include "HealthComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -14,6 +15,12 @@ class ADVANCEDHOMEWORK1_API AEnemy : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemy();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UHealthComponent* HealthComponent;
+
+	UFUNCTION()
+	void HandleDeath(AActor* Killer);
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,11 +33,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// ºí·çÇÁ¸°Æ®¿¡¼­ È£ÃâÇÒ ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	void PerformAsyncTrace(FVector Start, FVector End);
 
-	// Æ®·¹ÀÌ½º ¿Ï·á ½Ã È£ÃâµÉ ÄÝ¹é ÇÔ¼ö
+	// Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½Ï·ï¿½ ï¿½ï¿½ È£ï¿½ï¿½ï¿½ ï¿½Ý¹ï¿½ ï¿½Ô¼ï¿½
 	void OnTraceCompleted(const FTraceHandle& Handle, FTraceDatum& Data);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "AI")

@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SandboxWeaponBase.h"
-#include "GameFramework/Character.h"        // ACharacter Å¬·¡½º Á¤ÀÇ
+#include "GameFramework/Character.h"        // ACharacter Å¬ 
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "HealthComponent.h"
 
 void ASandboxWeaponBase::Fire()
 {
@@ -18,22 +19,19 @@ void ASandboxWeaponBase::LinetraceOneShot(FVector Direction)
 		ACharacter* MyCharacter = Cast<ACharacter>(MyOwner);
 		if (MyCharacter)
 		{
-			// Ä³¸¯ÅÍÀÇ GetMesh()¸¦ È£Ãâ
+			// ìºë¦­í„° ë©”ì‰¬ì—ì„œ ì†Œì¼“ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			USkeletalMeshComponent* CharacterMesh = MyCharacter->GetMesh();
 			FVector SocketLocation = CharacterMesh->GetSocketLocation(FName("weapon_r_muzzle"));
-			UE_LOG(LogTemp, Warning, TEXT("Socket Location: %s"), *SocketLocation.ToString());	
-			// ¼ÒÄÏ À§Ä¡ °¡Á®¿À±â
-			FHitResult Hit(ForceInit); // ForceInitÀ¸·Î °­Á¦ ÃÊ±âÈ­ °¡´É
+
+			// ížˆíŠ¸ ê²°ê³¼ ë° ë ˆì´ìºìŠ¤íŠ¸ ì„¤ì •
+			FHitResult Hit(ForceInit); 
 			UCameraComponent* Camera = MyCharacter->FindComponentByClass<UCameraComponent>();
 			if (!Camera) return;
 
-			// 2. Á¶ÁØÁ¡Àº Ä«¸Þ¶óÀÇ À§Ä¡¿¡¼­ ½ÃÀÛÇÕ´Ï´Ù.
 			FVector Start = Camera->GetComponentLocation();
+			FVector End = Start + (Direction * Range); // Use passed direction
 
-			// 3. ¹æÇâÀº Ä«¸Þ¶ó°¡ ¹Ù¶óº¸´Â ¹æÇâ(ForwardVector)À¸·Î °íÁ¤!
-			FVector End = Start + (Camera->GetForwardVector() * Range);
-
-			UKismetSystemLibrary::LineTraceSingle(
+			if (UKismetSystemLibrary::LineTraceSingle(
 				this,
 				Start,
 				End,
@@ -46,10 +44,24 @@ void ASandboxWeaponBase::LinetraceOneShot(FVector Direction)
 				FLinearColor::Red,
 				FLinearColor::Green,
 				5.f
-			);
+			))
+			{
+				AActor* HitActor = Hit.GetActor();
+				if (HitActor)
+				{
+					UHealthComponent* HitHealth = HitActor->FindComponentByClass<UHealthComponent>();
+					if (HitHealth)
+					{
+						// Default damage if no data asset is found, or we can pass it from BP
+						float DamageToApply = 10.0f; 
+						HitHealth->TakeDamage(DamageToApply, GetOwner());
+					}
+				}
+			}
 		}
 	}
 }
+
 
 void ASandboxWeaponBase::PlaySound(USoundBase* Sound)
 {
@@ -71,7 +83,7 @@ void ASandboxWeaponBase::SetAiming(bool bNewAiming)
 {
 	bIsAiming = bNewAiming;
 
-	// Á¶ÁØ ÁßÀÏ ¶§ÀÇ ·ÎÁ÷ (¿¹: ÅºÆÛÁü °¨¼Ò)
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½: Åºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	if (bIsAiming) {
 		// CurrentSpread *= 0.5f; 
 	}

@@ -19,6 +19,12 @@ ASandboxPlayerCharacter::ASandboxPlayerCharacter()
     // 2. 카메라 생성 및 스프링암에 부착
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(SpringArm);
+
+    // 3. 헬스 컴포넌트 생성
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+    // 4. 퀘스트 컴포넌트 생성
+    QuestComponent = CreateDefaultSubobject<UQuestComponent>(TEXT("QuestComponent"));
 }
 
 void ASandboxPlayerCharacter::StartFire()
@@ -48,10 +54,34 @@ void ASandboxPlayerCharacter::OnStopAiming()
     TargetArmLength = 300.f;
 }
 
+void ASandboxPlayerCharacter::HandleDeath()
+{
+    // 사망 처리 로직
+    UE_LOG(LogTemp, Warning, TEXT("Player is DEAD!"));
+    
+    // 입력을 비활성화하거나 봉인
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (PC)
+    {
+        DisableInput(PC);
+    }
+
+    // 래그돌 설정
+    GetMesh()->SetSimulatePhysics(true);
+    GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+    
+    // 무기 부착 해제 등 추가 작업 가능
+}
+
 // Called when the game starts or when spawned
 void ASandboxPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+    if (HealthComponent)
+    {
+        HealthComponent->OnHealthDead.AddDynamic(this, &ASandboxPlayerCharacter::HandleDeath);
+    }
 
 
     // 무기 스폰 및 부착 로직
