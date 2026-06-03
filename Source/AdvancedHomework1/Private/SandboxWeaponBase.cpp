@@ -14,49 +14,47 @@ void ASandboxWeaponBase::Fire()
 void ASandboxWeaponBase::LinetraceOneShot(FVector Direction)
 {
 	AActor* MyOwner = GetOwner();
-	if (MyOwner)
+	if (!MyOwner) return;
+
+	ACharacter* MyCharacter = Cast<ACharacter>(MyOwner);
+	if (!MyCharacter) return;
+
+	// 플레이어의 컨트롤러 회전값(조준 방향)을 가져옴
+	FRotator AimRotation = MyCharacter->GetControlRotation();
+	FVector AimDirection = AimRotation.Vector();
+
+	// 총알이 시작될 위치 (캐릭터의 무기 소켓 위치)
+	FVector Start = MyCharacter->GetMesh()->GetSocketLocation(FName("weapon_r_muzzle"));
+	
+	// 소켓 위치가 잘못되었다면 캐릭터 위치에서 약간 위쪽(눈높이)에서 시작
+	if (Start.IsZero())
 	{
-		ACharacter* MyCharacter = Cast<ACharacter>(MyOwner);
-		if (MyCharacter)
+		Start = MyCharacter->GetActorLocation() + FVector(0, 0, 60.0f);
+	}
+
+	FVector End = Start + (AimDirection * 15000.0f);
+
+	FHitResult Hit(ForceInit); 
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(MyOwner);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Camera, Params);
+
+	// 디버그 라인: 이제 총구에서 조준점 방향으로 정확히 나갑니다.
+	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Green : FColor::Red, false, 1.0f, 0, 1.0f);
+
+	if (bHit)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (HitActor)
 		{
-			// 캐릭터 메쉬에서 소켓 위치 가져오기
-			USkeletalMeshComponent* CharacterMesh = MyCharacter->GetMesh();
-			FVector SocketLocation = CharacterMesh->GetSocketLocation(FName("weapon_r_muzzle"));
-
-			// 히트 결과 및 레이캐스트 설정
-			FHitResult Hit(ForceInit); 
-			UCameraComponent* Camera = MyCharacter->FindComponentByClass<UCameraComponent>();
-			if (!Camera) return;
-
-			FVector Start = Camera->GetComponentLocation();
-			FVector End = Start + (Direction * Range); // Use passed direction
-
-			if (UKismetSystemLibrary::LineTraceSingle(
-				this,
-				Start,
-				End,
-				UEngineTypes::ConvertToTraceType(ECC_Visibility),
-				false,
-				{ this, GetOwner() },
-				EDrawDebugTrace::ForDuration,
-				Hit,
-				true,
-				FLinearColor::Red,
-				FLinearColor::Green,
-				5.f
-			))
+			UE_LOG(LogTemp, Warning, TEXT("HIT: %s"), *HitActor->GetName());
+			
+			UHealthComponent* HitHealth = HitActor->FindComponentByClass<UHealthComponent>();
+			if (HitHealth)
 			{
-				AActor* HitActor = Hit.GetActor();
-				if (HitActor)
-				{
-					UHealthComponent* HitHealth = HitActor->FindComponentByClass<UHealthComponent>();
-					if (HitHealth)
-					{
-						// Default damage if no data asset is found, or we can pass it from BP
-						float DamageToApply = 10.0f; 
-						HitHealth->TakeDamage(DamageToApply, GetOwner());
-					}
-				}
+				HitHealth->TakeDamage(34.0f, MyOwner);
 			}
 		}
 	}

@@ -1,12 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "HealthComponent.h"
 
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	CurrentHealth = MaxHealth;
+	MaxHealth = 100.0f;
+	CurrentHealth = 100.0f;
 }
 
 void UHealthComponent::BeginPlay()
@@ -20,7 +18,6 @@ void UHealthComponent::TakeDamage(float DamageAmount, AActor* DamageCauser)
 	if (IsDead()) return;
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
-	
 	OnHealthDamaged.Broadcast(CurrentHealth, MaxHealth);
 
 	if (IsDead())

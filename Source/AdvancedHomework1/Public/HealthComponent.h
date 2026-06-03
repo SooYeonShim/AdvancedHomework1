@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2026. All Rights Reserved.
 
 #pragma once
 
@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float MaxHealth = 100.0f;
+	float MaxHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float CurrentHealth;
@@ -41,7 +41,7 @@ public:
 	void TakeDamage(float DamageAmount, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetHealthPercent() const { return CurrentHealth / MaxHealth; }
+	float GetHealthPercent() const { return (MaxHealth > 0.0f) ? (CurrentHealth / MaxHealth) : 0.0f; }
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool IsDead() const { return CurrentHealth <= 0.0f; }

@@ -8,7 +8,7 @@
 
 void UQuestSubsystem::NotifyMonsterKilled(AActor* Killer, AActor* Victim)
 {
-	if (!Killer) return;
+	if (!Killer || !GetWorld()) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Monster %s killed by %s. Distributing progress..."), *Victim->GetName(), *Killer->GetName());
 
